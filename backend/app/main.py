@@ -1,0 +1,33 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
+from app.api.v1.router import api_router
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    description="Integrated AICTE Approval Workflow Automation, Compliance Monitoring and Alert Management System (Problem SIH26262)",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
+
+# Setup CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include API v1 router
+app.include_router(api_router, prefix=settings.API_V1_STR)
+
+@app.get("/", tags=["Root"])
+def root():
+    return {
+        "message": "Welcome to RULIQ — Rule Intelligence and Compliance Engine",
+        "documentation": "/docs",
+        "health_check": f"{settings.API_V1_STR}/health"
+    }
